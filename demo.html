@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>reveal.js – The HTML Presentation Framework</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/black.css" id="theme">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides" style="background: #2222;">
+				<section>
+					<h3>Global Fertility Rate</h3>
+					<p>
+						<small>IS 545 Final Project</small>
+					</p>
+					<p>
+						<small>Ria Dhanani</small>
+					</p>
+				</section>
+
+				<section>
+					<h4>Introduction</h4><br/>
+					<p style="text-align: left; margin-left: 30px;">
+						Fertility rate is the average number of children born to women during their reproductive years. The total fertility rate (TFR) is a major determinant of population growth rate.
+						The visualization shows the total fertility rate(per woman) and the fertility rate of women in different countries.
+					</p>
+				</section>
+
+				<section>
+					<h6>Questions addressed by the Visualization</h6>
+					<br/>
+					<ul style="margin-left: 70px;">
+						<li>What is the total fertility rate in each country?</li>
+						<li>How much is the fertility rate of countries that have a high urban population growth rate?</li>
+						<li>Has the fertility rate increased or decreased over the years in the United States?</li>
+					</ul>
+				</section>
+
+				<section>
+					<h6>Data</h6>
+					<br/>
+					<ul>
+						<li>
+						<p style="text-align: left; word-wrap: break-word; margin-left: 30px; text-decoration: underline;">
+							<a href="https://gist.githubusercontent.com/micahstubbs/8e15870eb432a21f0bc4d3d527b2d14f/raw/a45e8709648cafbbf01c78c76dfa53e31087e713/world_countries.json">world_countries.json</a>
+						</p></li>
+						<li>
+						<p style="text-align: left; word-wrap: break-word; margin-left: 30px; text-decoration: underline;"><a href="https://gist.githubusercontent.com/micahstubbs/8e15870eb432a21f0bc4d3d527b2d14f/raw/a45e8709648cafbbf01c78c76dfa53e31087e713/world_population.tsv">world_population.tsv</a></p></li>
+						<li>
+						<p style="text-align: left; word-wrap: break-word; margin-left: 30px; text-decoration: underline;">
+							<a href="http://www.exploredata.net/Downloads/WHO-Data-Set">who.csv</a>
+						</p>
+						</li>
+						<li>
+						<p style="text-align: left; word-wrap: break-word; margin-left: 30px; text-decoration: underline;">
+							<a href="https://datahub.io/world-bank/sp.dyn.tfrt.in#resource-sp_dyn_tfrt_in_zip">Total Fertility Rate.csv</a>
+						</p></li>
+				</section>
+
+				<section>
+					<h6>Visualization Details</h6>
+					<br/>
+					<small style="margin-left: 15px; text-align: left; margin-right: 15px;">The visualization has three charts. The map and the scatterplot are interconnected wherein when the user hovers over
+						a country in the map, it is highlighted in the scatterplot. The scatterplot has the brushing feature. The third chart is a 
+						static line graph showing the trend of fertility rate in the United States. The upcoming slides briefly show the visualizatiosn with their respective
+						code snippets.
+					</small>
+				</section>
+
+
+
+				<!-- Example of nested vertical slides -->
+				<section>
+					<section>
+						<h4>Visualization</h4>
+						<small>Map displaying fertility value of various countries.</small>
+						<img class="r-frame" style="background: rgba(255,255,255,0.1);" width="600" height="380" data-src="map.png" alt="Down arrow">
+					</section>
+					<section>
+						<small data-id="code-title">Code Snippet</small>
+					<pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+						const map = svg
+        					.append('g')
+        					.attr('class', 'map');
+
+							svg.append('g')
+							.attr('class', 'countries')
+							.selectAll('path')
+							.data(countries.features)
+							.enter().append('path')
+							.attr("class", d => { return "COUNTRY-CODE-"+d.id; })
+							.attr('d', path)
+							.style('fill', d => color(fertilityById[d.id]))
+							.style('stroke', 'white')
+							.style('opacity', 0.8)
+							.style('stroke-width', 0.3)
+							.on('mouseover',mouseover)
+							.on('mousemove', function(d) {
+			
+							d3.select(this).style("fill","red");
+			
+							tooltip
+								.html("Fertility value: " + fertilityById[d.id] + "<br/>" + "Country: " + d.properties.name)
+								.style("left", (d3.event.pageX) + "px")
+								.style("top", (d3.event.pageY - 28) + "px");
+					</code></pre>
+					</section>
+					<section>
+						<h4>Visualization</h4>
+						<small>Scatterplot showing the fertility rate for countries with a hiigh urban population growth rate.</small>
+						<img class="r-frame" style="background: rgba(255,255,255,0.1);" width="500" height="480" data-src="scatterplot.png" alt="Down arrow">
+					</section>
+					<section>
+						<small data-id="code-title">Code Snippet</small>
+					<pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+						var dot = scatterplot.selectAll(".dot")
+            			.data(who)
+            			.enter().append("circle")
+            			.attr("class", d => { return "dot COUNTRY-"+ d.name; } )
+            			.attr("r", 3.5)
+            			.attr("cx", xMap)
+            			.attr("cy", yMap)
+            			.style("fill", function(d) { return color(d[fieldColor]);})
+            			.on("mouseover", mouseover)
+            			.on("mousemove",function(d) {
+                		tooltip
+                    		.html("Fertility value: " + fertilityById[d.id] + "<br/>" + "Country ID: " + d.id)
+                    		.style("left", (d3.event.pageX) + "px")
+                    		.style("top", (d3.event.pageY - 28) + "px");
+            			})
+					</code></pre>
+					</section>
+
+
+					<section>
+						<h4>Visualization</h4>
+						<small>Line chart for visualizing the trend in fertility rate in the United States.</small>
+						<img class="r-frame" style="background: rgba(255,255,255,0.1);" width="500" height="480" data-src="linechart.png" alt="Down arrow">
+					</section>
+					<section>
+						<small data-id="code-title">Code Snippet</small>
+					<pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+						Promise.all([
+        					d3.csv('USDataSubset.csv')
+    					]).then(function(data) {
+
+        				let FT = data[0];
+        
+        				let parseDate = d3.timeParse("%y");	
+
+        				FT.forEach(d => {
+            				if(d["Country Name"] == "United States") {
+                				d.Year = parseDate(d.Year), d.Value = (d.Value)}
+                
+        				});
+
+						// X axis
+						var x = d3.scaleLinear()
+    					.domain(d3.extent(FT, function(d) { return d.Year; }))
+    					.range([ 0, width2 ]);
+  						chart2.append("g")
+    					.attr("transform", "translate(0," + height2 + ")")
+    					.call(d3.axisBottom(x))
+
+						// Y axis
+						var y = d3.scaleLinear()
+      					.domain([0, d3.max(FT, function(d) { return +d.Value; })])
+      					.range([ height2, 0 ]);
+    					chart2.append("g")
+      					.call(d3.axisLeft(y));
+
+						// Draw the line  
+	  					chart2.append("path")
+	  					.datum(FT)
+	  					.attr("fill", "none")
+	  					.attr("stroke", "steelblue")
+	  					.attr("stroke-width", 1.5)
+	  					.attr("d", d3.line()
+						.x(function(d) { return x(d.Year) })
+						.y(function(d) { return y(d.Value) })
+					)
+					</code></pre>
+					</section>
+
+				</section>
+
+				<section>
+					<h4>Conclusion</h4><br/>
+					<p>
+						The visualization can be accessed <a href="https://riadhanani.github.io/FertilityDataViz/">here</a>
+						The future work will include a dropdown with countries for the line chart so the user can interact and view the trend line
+						for the country of their choice.
+					</p>
+				</section>
+
+
+			</div>
+
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/zoom/zoom.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/search/search.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+
+			// Also available as an ES module, see:
+			// https://revealjs.com/initialization/
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				center: true,
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight ]
+			});
+
+		</script>
+
+	</body>
+</html>
